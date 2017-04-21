@@ -1,6 +1,7 @@
 <?
 /**
  * @var \TeknoETicaret\Shopping\Cart\Cart $cart
+ * @var array                             $summaryDetails
  * @var array                             $checkFreeShipping
  * @var float                             $minInstallmentPrice
  * @var bool                              $showUseShoppingCheck
@@ -44,8 +45,9 @@ $coupon = $cart->getCoupon();
                         ?>
                         <tr class="cart-item">
                             <td class="cart-image">
-                                <a href="#">
-                                    <img width="98" src="<?= $obProduct->getPhoto('thumb') ?>">
+                                <a href="<?= $obProduct->getUrl() ?>">
+                                    <img width="98" src="<?= $obProduct->getPhoto('w98h98') ?>"
+                                            srcset="<?= $obProduct->getPhoto('w98h98') ?> 98w, <?= $obProduct->getPhoto('w196h196') ?> 196w">
                                 </a>
                             </td>
                             <td class="cart-description">
@@ -84,14 +86,14 @@ $coupon = $cart->getCoupon();
                                     <a onclick="quantity('#qty-<?= $obProduct->product_id ?>','down')" href="javascript:;">-</a>
                                     <div>
                                         <input type="text" id="qty-<?= $obProduct->product_id ?>" data-ref="update<?= $obProduct->product_id ?>" title="Ürün Adedi"
-                                            name="quantity[<?= $obProduct->product_id ?>]" class="form-control input-xs quantity_input text-center" min="0"
-                                            max="<?= $obProduct->saleableProductCount() ?>" value="<?= $product->getQuantity() ?>" onblur="quantity($(this))">
+                                                name="quantity[<?= $obProduct->product_id ?>]" class="form-control input-xs quantity_input text-center" min="0"
+                                                max="<?= $obProduct->saleableProductCount() ?>" value="<?= $product->getQuantity() ?>" onblur="quantity($(this))">
                                         <label for="productQuantity">ADET</label>
                                     </div>
                                     <a onclick="quantity('#qty-<?= $obProduct->product_id ?>','up')" href="javascript:;">+</a>
                                 </div>
                                 <a href="/cart/remove/<?= $obProduct->product_id ?>" onclick="return confirm('Bu ürünü sepetinizden çıkarmak istediğinize emin misiniz?');"
-                                    class="remove-icon"><span aria-hidden="true" class="glyphicon glyphicon-trash"></span></a>
+                                        class="remove-icon"><span aria-hidden="true" class="glyphicon glyphicon-trash"></span></a>
                             </td>
                             <td class="cart-quantity text-right">
                                 <?= icms::format_money($product->getTotalPrice()) ?>
@@ -108,38 +110,13 @@ $coupon = $cart->getCoupon();
     </div><!-- #table-responsive# -->
     <table class="col-md-12 table" id="cart-payment-info">
         <tbody>
-        <tr class="cart-total">
-            <td class="col-md-8 hidden-xs"></td>
-            <td class="text-right col-md-2 col-xs-6">Sepet Toplamı</td>
-            <td id="" class="col-md-2 col-xs-6"><?= icms::format_money($cart->getTotalPriceAfterDiscounts()) ?></td>
-        </tr>
-        <? if ($cart->getCheckCouponDiscountAmount() > 0) { ?>
-            <? if (!is_null($memberShoppingCheck)) { ?>
-                <tr class="cart-total">
-                    <td class="row-space col-md-8 hidden-xs"></td>
-                    <td class="text-right col-md-2 col-xs-6">Alışveriş Çeki</td>
-                    <td id="" class="col-md-2 col-xs-6">- <?= icms::format_money($cart->getCheckCouponDiscountAmount()) ?></td>
-                </tr>
-            <? } elseif (!is_null($coupon)) { ?>
-                <tr class="cart-total">
-                    <td class="row-space col-md-8 hidden-xs"></td>
-                    <td class="text-right col-md-2 col-xs-6">Kupon Kodu</td>
-                    <td id="" class="col-md-2 col-xs-6">- <?= icms::format_money($cart->getCheckCouponDiscountAmount()) ?></td>
-                </tr>
-            <? } ?>
-        <? } ?>
-        <? if ($cart->getCampaignAmount()) { ?>
+        <? foreach ($summaryDetails AS $detail) { ?>
             <tr class="cart-total">
-                <td class="row-space col-md-8 hidden-xs"></td>
-                <td class="text-right col-md-2 col-xs-6">İndirim</td>
-                <td id="" class="col-md-2 col-xs-6">- <?= icms::format_money($cart->getCampaignAmount()) ?></td>
+                <td class="col-md-8 hidden-xs"></td>
+                <td class="text-right col-md-2 col-xs-6"><?= $detail['title'] ?></td>
+                <td class="col-md-2 col-xs-6"><?= $detail['value'] ?></td>
             </tr>
         <? } ?>
-        <tr class="delivery">
-            <td class="row-space col-md-8 hidden-xs"></td>
-            <td class="text-right col-md-2 col-xs-6">Kargo Ücreti</td>
-            <td id="" class="col-md-2 col-xs-6"><?= ($cart->getShippingCost() > 0) ? icms::format_money($cart->getShippingCost()) : 'Ücretsiz' ?></td>
-        </tr>
         <tr class="total-payment">
             <td class="row-space col-md-8 hidden-xs"></td>
             <td class="text-right col-md-2 col-xs-6">Ödenecek Tutar</td>

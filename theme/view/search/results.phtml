@@ -1,6 +1,7 @@
 <?
 /**
- * @var string       $filterHtml
+ * @var string       $activeFiltersHtml
+ * @var string       $facetHtml
  * @var string       $descriptionBlock
  * @var ob_category  $category
  * @var ob_brand     $brand
@@ -24,7 +25,10 @@
         </div>
     <? } ?>
     <div class="col-md-3 col-xs-12" id="filtreler">
-        <?= $filterHtml ?>
+        <div class="filtreler">
+            <?= $activeFiltersHtml ?>
+            <?= $facetHtml ?>
+        </div>
     </div>
     <!-- #filtreler -->
     <div class="col-md-9 col-xs-12" id="productList">
@@ -53,7 +57,7 @@
                     if (isset($baseUrl)) {
                         $url = parse_url($baseUrl);
                     } else {
-                        $url = array('path' => "/ara");
+                        $url = ['path' => "/ara"];
                     }
                     foreach ($sortLinks as $sortLink) {
                         if (isset($sortLink['orderType'])) {
@@ -64,7 +68,7 @@
                         $sortLink['title'] = str_replace('(Azalan)', '<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>', $sortLink['title']);
                         ?>
                         <li><a href="<?= icms::build_url($url) ?>"
-                                class="<?= $sortLink['isActive'] ? 'active' : '' ?> <?= $sortLink['class'] ?>"><?= $sortLink['title'] ?></a></li>
+                                    class="<?= $sortLink['isActive'] ? 'active' : '' ?> <?= $sortLink['class'] ?>"><?= $sortLink['title'] ?></a></li>
                     <? } ?>
                 </ul><!-- #productFilter# -->
             </div><!-- #block# -->
@@ -85,7 +89,9 @@
                                     <? } ?>
                                     <span class="price"><?= icms::format_money($product->getSalePrice()) ?></span>
                                     <a href="javascript:" onclick="addToCart('<?= $product->product_id ?>', '1', '')" class="addToCart"><span
-                                            class="glyphicon glyphicon-shopping-cart"></span></a>
+                                                class="glyphicon glyphicon-shopping-cart"></span></a>
+                                <? } elseif (\TeknoETicaret\Config\Settings::get('product.notsaleable.showprice') == 1) { ?>
+                                    <span class="price"><?= icms::format_money($product->getSalePrice()) ?></span>
                                 <? } ?>
                             </div>
                             <div class="badges">

@@ -19,7 +19,7 @@
             <? foreach ($paymentTabs as $paymentKey => $paymentName) { ?>
                 <li role="presentation">
                     <a href="#<?= $paymentKey ?>Tab" aria-controls="<?= $paymentKey ?>Tab" role="tab" data-url="/checkout/paymentForm/<?= $paymentKey ?>"
-                        data-target="#<?= $paymentKey ?>Tab" data-toggle="tab" data-paymentmethod="<?= $paymentKey ?>"> <?= $paymentName ?> </a>
+                            data-target="#<?= $paymentKey ?>Tab" data-toggle="tab" data-paymentmethod="<?= $paymentKey ?>"> <?= $paymentName ?> </a>
                 </li>
             <? } ?>
         </ul>
@@ -28,7 +28,12 @@
                 <div role="tabpanel" class="tab-pane fade" id="<?= $paymentKey ?>Tab"></div>
             <? } ?>
         </div>
-        <div class="checkoutContent mb" id="agreements" style="display: none"></div>
+        <div class="checkoutContent mb">
+            <div class="visible-xs-block text-center"><a class="btn btn-default" href="javascript:" id="MobileAgreementSwitcher">Sözleşmeleri Göster</a></div>
+            <div id="agreementWrapper" class="hideAgreementsOnMobile">
+                <div id="agreements" style="display: none"></div>
+            </div>
+        </div>
     </div>
     <div class="col-md-4 col-xs-12" id="cartSummary"></div>
 </div>

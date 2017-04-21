@@ -9,7 +9,7 @@ function initMobileMenu() {
 }
 $(function () {
     /* fixed Navbar */
-    navbar = $("#boardnav");
+    navbar = $("#header-nav-bar");
     if (navbar.length > 0) {
         navbaroffset = navbar.offset().top;
     }
@@ -30,7 +30,7 @@ $(function () {
         if (initMobile == false && $(window).innerWidth() < 1000) {
             initMobileMenu();
         }
-    });
+    }).trigger('scroll');
     if ($(window).innerWidth() < 1000) {
         initMobileMenu();
     }

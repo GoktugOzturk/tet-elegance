@@ -81,7 +81,7 @@ header {
 
 .product-piece {
     margin: 0 auto;
-    width: 111px;
+    width: 120px;
     height: 50px;
     border: 2px solid #DADADA;
     float: left;
@@ -91,7 +91,7 @@ header {
     color: #B6B6B6;
     font-size: 22px;
     float: left;
-    width: 33px;
+    width: 28px;
     text-align: center;
     margin-top: 5px;
     text-decoration: none;
@@ -108,7 +108,8 @@ header {
     font-size: 23px;
     float: left;
     text-align: center;
-    width: 37px;
+    width: 60px;
+    padding: 6px 4px;
 }
 
 .product-piece div label {
@@ -158,6 +159,12 @@ header {
     width: 40%;
 }
 
+@media only screen and (max-width: 500px) {
+    .hideAgreementsOnMobile {
+        display: none;
+    }
+}
+
 @media only screen and (max-width: 767px) {
     h2.block-title {
         text-align: center;
@@ -196,6 +203,7 @@ header {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     border-top: 0;
+    padding: 10px 30px 30px;
 }
 
 /* Checkout Adımlar: Üye Girişi */
@@ -213,7 +221,8 @@ header {
 }
 
 .addressView h4 {
-    font-size: 13px
+    font-size: 14px;
+    margin: 0 0 4px;
 }
 
 .addressView p {
@@ -237,11 +246,16 @@ header {
     overflow-y: auto;
 }
 
+#deliveryOptions {
+    padding: 0;
+}
+
 #deliveryOptions button {
     width: 100%;
     text-align: center;
     height: 50px;
     border-radius: 5px;
+    margin-bottom: 10px;
 }
 
 .create-record {
@@ -357,6 +371,7 @@ ul.card_logos {
 
 .orderSummaryDetails .orderArea {
     padding-bottom: 5px;
+    margin-bottom: 5px;
     border-bottom: 1px dotted #E1E1E1;
 }
 

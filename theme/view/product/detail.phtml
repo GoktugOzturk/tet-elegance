@@ -79,7 +79,7 @@
         <div class="shareIcons">
             <ul class="clearfix">
                 <li class="callToShare">Paylaş:</li>
-                <?= implode('', view::getShareIcons($mainProductUrl)) ?>
+                <?= '<li>' . implode('</li><li>', view::getShareIcons($mainProductUrl)) . '</li>' ?>
             </ul>
         </div>
         <div class="productbadges badges">
@@ -91,7 +91,7 @@
             <? if ($obProduct->hasBadge(ob_product::BADGE_FAST_CARGO)) { ?>
                 <div class="badge fast-cargo">
                     <div class="option"><span class="sprite"></span><span
-                            class="text"><?= ($obProduct->warehouse_stock <= 5 ? 'SON ' . $obProduct->warehouse_stock . ' ÜRÜN' : 'HIZLI KARGO') ?></span></div>
+                                class="text"><?= ($obProduct->warehouse_stock <= 5 ? 'SON ' . $obProduct->warehouse_stock . ' ÜRÜN' : 'HIZLI KARGO') ?></span></div>
                 </div>
             <? } ?>
             <? if ($obProduct->hasBadge(ob_product::BADGE_DISCOUNT)) { ?>
@@ -134,7 +134,7 @@
                     <ul class="nav nav-pills">
                         <? foreach ($propertyData['options'] AS $optionId => $optionData) { ?>
                             <li <?= ((isset($propertyData['selectedOption']) && $propertyData['selectedOption'] == $optionData['option_id']) ? 'class="active"' : '') ?>><a
-                                    href="<?= $optionData['url'] ?>"><?= $optionData['name'] ?></a>
+                                        href="<?= $optionData['url'] ?>"><?= $optionData['name'] ?></a>
                             </li>
                         <? } ?>
                     </ul>
@@ -149,9 +149,9 @@
                             <input type="hidden" name="property[<?= $propertyId ?>]" value="<?= $propertyData['selected'] ?>">
                             <label><?= $propertyData['name'] ?></label>
                             <ul class="nav nav-pills">
-                                <? foreach ($propertyData['options'] AS $optionId => $optionName) { ?>
+                                <? foreach ($propertyData['options'] AS $optionId => $optionData) { ?>
                                     <li <?= ($propertyData['selected'] == $optionId ? 'class="active"' : '') ?> id="property-<?= $propertyId ?>-<?= $optionId ?>"><a
-                                            href="javascript:" onclick="chooseProperty('<?= $propertyId ?>', '<?= $optionId ?>')"><?= $optionName ?></a></li>
+                                                href="javascript:" onclick="chooseProperty('<?= $propertyId ?>', '<?= $optionId ?>')"><?= $optionData['name'] ?></a></li>
                                 <? } ?>
                             </ul>
                         </div>
@@ -213,7 +213,7 @@
                         <a href="javascript:;" onclick="quantity('#productQuantity','down')">-</a>
                         <div>
                             <input name="quantity" id="productQuantity" class="text-center" value="1" type="text" min="1" max="<?= $obProduct->saleableProductCount() ?>"
-                                onblur="quantity($(this))">
+                                    onblur="quantity($(this))">
                             <label for="productQuantity">ADET</label>
                         </div>
                         <a href="javascript:;" onclick="quantity('#productQuantity','up')">+</a>
@@ -226,14 +226,22 @@
                     </a>
                 </div>
             <? } else { ?>
+                <? if (\TeknoETicaret\Config\Settings::get('product.notsaleable.showprice') == 1) { ?>
+                    <div class="product-detail">
+                        <div class="product-price">
+                            <?= icms::format_money($obProduct->getSalePrice(), null) ?><span class="tl"> TL</span>
+                        </div>
+                    </div>
+                <? } ?>
                 <div class="stockAlertBox">
                     Bu ürün geçici olarak temin edilemiyor.
                 </div>
                 <div class="detailsAreaCart">
                     <input type="hidden" id="productId" value="<?= $obProduct->product_id ?>"/>
                     <input type="hidden" id="fromSource" value="<?= (isset($_GET['from']) ? $_GET['from'] : '') ?>"/>
-                    <a class="stockReminder acc-btn" href="javascript:" role="button"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
-                        Gelince Haber Ver</a>
+                    <a href="javascript:" class="stockReminder acc-btn" onclick="addStockAlert($('#productId').val())" role="button">
+                        <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Gelince Haber Ver
+                    </a>
                 </div>
             <? } ?>
         </div>
@@ -242,7 +250,7 @@
     <div class="clearfix"></div>
 </div><!-- #product-wrapepr# -->
 <div class="product-info mb30">
-    <ul class="nav mb30" role="tablist">
+    <ul class="nav" role="tablist">
         <li class="active">
             <a href="#tabDetails" role="tab" data-toggle="tab">AÇIKLAMALAR</a>
         </li>
@@ -293,7 +301,7 @@
                     }
                 }
                 if ($obProduct->dimension_width > 0 || $obProduct->dimension_height > 0 || $obProduct->dimension_depth > 0) {
-                    $dimensionArr = array();
+                    $dimensionArr = [];
                     if ($obProduct->dimension_width > 0) {
                         $dimensionArr[] = ' Genişlik: ' . $obProduct->dimension_width . 'cm';
                     }
@@ -317,82 +325,17 @@
             </table>
         </div><!-- #tabpanel# -->
         <div role="tabpanel" class="tab-pane" id="tabComments">
-            <? if ($reviewData->helpful) { ?>
-                <div>
-                    <h4>FAYDALI YORUMLAR</h4>
-                    <?
-                    /** @var product_review_model $review */
-                    foreach ($reviewData->helpful as $review) {
-                        $author = $review->getAuthor();
-                        ?>
-                        <div class="oneComment helpful">
-                            <div class="clearfix">
-                                <div class="pull-left commentTitle"><?= $review->review_title ?></div>
-                                <div class="pull-right personelScore rating">
-                                    <div class="stars" data-score="<?= $review->review_rating ?>"></div>
-                                </div>
-                            </div>
-                            <div class="clearfix commentAuthor">
-                                <div class="pull-left"><?= icms::uctitle($author->firstname . ' ' . mb_substr($author->surname, 0, 1)) ?>.</div>
-                                <div class="pull-right commentDate"><?= icms::format_datetime($review->review_time) ?></div>
-                            </div>
-                            <p class="commentContent"><?= $review->review_text ?></p>
-                            <? if (session::memberId() != $review->member_id) { ?>
-                                <div class="mt">
-                                    <span class="isCommentHelpful">Bu yorumu faydalı buldunuz mu ?</span> &nbsp;
-                                    <a href="javascript:" class="btn btn-default btn-xs commentVote" data-type="Up" data-id="<?= $review->review_id ?>">Evet
-                                        (<?= $review->vote_up_count ?>)</a> &nbsp;
-                                    <a href="javascript:" class="btn btn-default btn-xs commentVote" data-type="Down" data-id="<?= $review->review_id ?>">Hayır
-                                        (<?= $review->vote_down_count ?>)</a>
-                                </div>
-                            <? } ?>
-                        </div>
-                    <? } ?>
-                </div>
-            <? } ?>
-            <? if ($reviewData->reviews) { ?>
-                <div class="clearfix">
-                    <h4>SON YORUMLAR</h4>
-                    <?
-                    /** @var product_review_model $review */
-                    foreach ($reviewData->reviews as $review) {
-                        $author = $review->getAuthor();
-                        ?>
-                        <div class="oneComment">
-                            <div class="clearfix">
-                                <div class="pull-left commentTitle"><?= $review->review_title ?></div>
-                                <div class="pull-right personelScore rating">
-                                    <div class="stars" data-score="<?= $review->review_rating ?>"></div>
-                                </div>
-                            </div>
-                            <div class="clearfix commentAuthor">
-                                <div class="pull-left"><?= icms::uctitle($author->firstname . ' ' . mb_substr($author->surname, 0, 1)) ?>.</div>
-                                <div class="pull-right commentDate"><?= icms::format_datetime($review->review_time) ?></div>
-                            </div>
-                            <p class="commentContent"><?= $review->review_text ?></p>
-                            <? if (session::memberId() != $review->member_id) { ?>
-                                <div class="isCommentHelpful mt">
-                                    <span>Bu yorumu faydalı buldunuz mu ?</span> &nbsp;
-                                    <a href="javascript:" class="btn btn-default btn-xs commentVote" data-type="Up" data-id="<?= $review->review_id ?>">Evet
-                                        (<?= $review->vote_up_count ?>)</a> &nbsp;
-                                    <a href="javascript:" class="btn btn-default btn-xs commentVote" data-type="Down" data-id="<?= $review->review_id ?>">Hayır
-                                        (<?= $review->vote_down_count ?>)</a>
-                                </div>
-                            <? } ?>
-                        </div>
-                    <? } ?>
-                </div>
-            <? } ?>
+            <?= view::load("product/reviews", ['reviewData' => $reviewData]); ?>
             <div class="row productAddReview">
                 <? if ($reviewData->myCommentWaiting) { ?>
                     <div class="col-xs-12">
                         <h4>YORUMUNUZ ONAY BEKLİYOR</h4>
-                        <span class="commentWaiting">Bu ürün yazdığınız yorum onay bekliyor. Anlayışınız için teşekkür ederiz.</span>
+                        <span class="commentWaiting">Bu ürüne yazdığınız yorum onay bekliyor. Anlayışınız için teşekkür ederiz.</span>
                     </div>
                 <? } elseif (session::memberId()) { ?>
                     <div class="col-xs-6">
                         <h4>YORUMUNUZU YAZIN</h4>
-                        <form role="form" action="/product/add_comment" method="POST" id="frmComment">
+                        <form role="form" action="/product/add_comment" method="POST" onsubmit="return checkCommentForm(this)" id="frmComment">
                             <div class="form-group">
                                 <label for="comments">Ürün Değerlendirmeniz</label>
                                 <div class="personelScore clearfix">
@@ -423,12 +366,11 @@
                             <input type="hidden" name="product" value="<?= $mainProductId ?>"/>
                             <input type="hidden" name="redirect" value="<?= $_SERVER['REQUEST_URI'] ?>"/>
                             <button type="submit" class="btn btn-warning mb">Yorumu Gönder</button>
-                            <? /* <p style="font-size: 11px; color: #999;">yorum açıklaması</p> */ ?>
                         </form>
                     </div>
                 <? } else { ?>
                     <div class="col-xs-12 text-center">
-                        <a href="<?= $obProduct->getUrl() . "#tabComments" ?>" class="btn btn-warning mt mb login-required">Yorum yapabilmek için oturum açın</a>
+                        <a href="<?= $obProduct->getUrl() . "#tabComments" ?>" class="btn btn-primary mt mb login-required">Yorum yapabilmek için oturum açın</a>
                     </div>
                 <? } ?>
             </div>
@@ -438,28 +380,6 @@
     </div><!-- #tab-content# -->
     <script type="text/javascript">
         $(function () {
-            $(".stockReminder").click(function (e) {
-                e.preventDefault();
-                $(".stockAlertMsg").remove();
-                $.post("/product/add_stock_alert", {'product_id': $('input#productId').val()}, function (r) {
-                    if (r.Status === 'OK') {
-                        $(".stockAlertBox").html('<div class="alert alert-success" role="alert">' + r.Message + '</div>');
-                    } else {
-                        $(".stockAlertBox").html('<div class="alert alert-warning stockAlertMsg" role="alert">' + r.Message + '</div>');
-                    }
-                }, 'json');
-            });
-            $(".commentVote").click(function (e) {
-                var $this = $(this);
-                e.preventDefault();
-                $.post("/product/reviewVote", {review_id: $this.data('id'), vote_type: $this.data('type')}, function (r) {
-                    if (r.Status === 'OK') {
-                        $this.parents(".isCommentHelpful").html(r.Message);
-                    } else {
-                        alert(r.Message);
-                    }
-                }, 'json');
-            });
             var detailImages = $("#tabDetails").find("tr>td>img");
             if (detailImages && detailImages.length > 0) {
                 $.each(detailImages, function (key, image) {
@@ -473,10 +393,10 @@
 </div><!-- #product-info# -->
 <!-- widget -->
 <?= \TeknoETicaret\Widget\Block::addBlock('productUnder',
-    array(
+    [
         'productId' => $mainProductId,
         'categoryId' => $obProduct->category_id,
         'brandId' => $obProduct->brand_id,
-    )
+    ]
 )
 ?>
